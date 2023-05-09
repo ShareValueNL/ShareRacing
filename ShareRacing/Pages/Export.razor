@@ -1,0 +1,76 @@
+﻿@page "/export"
+
+@using ShareRacing.Data
+@inject TrackTimeService TrackTimeService
+@inject TrackService TrackService
+
+<div class="container">
+<h1>Export</h1>
+
+
+@if (_tracks == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+        <tr>
+            <th>Track</th>
+            <th>Name</th>
+            <th>Lap time</th>
+        </tr>
+        </thead>
+        <tbody>
+            @foreach (var track in _tracks.Where(x => x.TrackTimes != null && x.TrackTimes.Any()).OrderBy(x => x.Name))
+            {
+                @foreach (var trackTime in track.TrackTimes.OrderBy(x => x.Time))
+                {
+                    <tr>
+                        <td>@track.Name</td>
+                        <td>@trackTime.Name</td>
+                        <td>@ConvertToLapTime(trackTime.Time)</td>
+                    </tr>
+                }
+            }        
+        </tbody>
+    </table>
+}
+
+</div>
+
+@code {
+    private List<TrackTime> _trackTimes;
+    private Track[] _tracks;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _tracks = await TrackService.GetTracks();
+
+        foreach(var track in _tracks)
+        {
+            track.TrackTimes = await TrackTimeService.GetTrackTimes(track.Id);
+        }
+    }
+
+    private string ConvertToLapTime(int trackTime)
+    {
+        var seconds = trackTime / 1000;
+        var minutes = seconds / 60;
+        seconds %= 60;
+
+        return $"{minutes:00}:{seconds:00}.{trackTime % 1000:000}";
+    }
+
+    private int ConvertToMilliseconds(string lapTime)
+    {
+        var components = lapTime.Split(':');
+        var minutes = int.Parse(components[0]);
+        var secondsAndMilliseconds = components[1].Split('.');
+        var seconds = int.Parse(secondsAndMilliseconds[0]);
+        var milliseconds = int.Parse(secondsAndMilliseconds[1]);
+        var totalMilliseconds = minutes * 60 * 1000 + seconds * 1000 + milliseconds;
+        return totalMilliseconds;
+    }
+}
