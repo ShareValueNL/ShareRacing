@@ -1,0 +1,130 @@
+﻿@page "/tracktimes"
+
+@using ShareRacing.Data
+@inject TrackTimeService TrackTimeService
+@inject TrackService TrackService
+
+<div class="container">
+<h1>Track Times</h1>
+
+@if (_tracks == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <select class="form-control selectpicker" @onchange="SetSelectedTrack">
+        <option>--select--</option>
+        @foreach (var item in _tracks)
+        {
+            <option value="@item.Id">@item.Name</option>
+        }
+    </select>
+    <br /><br />
+}
+
+@if (_trackTimes == null)
+{
+    <h3>Select a track</h3>
+}
+else
+{
+    <div class="row">
+        <div class="col-md-6 form-group">
+            <label>Name</label>
+            <input @bind="_name" class="form-control" placeholder="Naam">
+        </div>
+        <div class="col-md-4 form-group">
+            <label>Lap time</label>
+            <input @bind="_laptime" class="form-control" placeholder="Laptime">
+        </div>
+        <div class="col-md-2 form-group">
+                <button class="btn btn-primary mt-md-4" @onclick="AddTrackTime">Add lap time</button>
+        </div>
+    </div>
+
+    <table class="table">
+        <thead>
+        <tr>
+            <th>Name</th>
+            <th>Lap time</th>
+            <th>Action</th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var trackTime in _trackTimes)
+        {
+            <tr>
+                <td>@trackTime.Name</td>
+                <td>@ConvertToLapTime(trackTime.Time)</td>
+                <td><button class="btn btn-danger" @onclick="() => DeleteTrackTime(trackTime.Id)">Delete</button></td>
+            </tr>
+        }
+        </tbody>
+    </table>
+}
+
+</div>
+
+@code {
+    private List<TrackTime> _trackTimes;
+    private Track[] _tracks;
+    private string _selectedTrack = "Maui";
+
+    private string _name;
+    private string _laptime;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _tracks = await TrackService.GetTracks();
+    }
+    
+    private string ConvertToLapTime(int trackTime)
+    {
+        var seconds = trackTime / 1000;
+        var minutes = seconds / 60;
+        seconds %= 60;
+        
+        return $"{minutes:00}:{seconds:00}.{trackTime % 1000:000}";
+    }
+
+    private int ConvertToMilliseconds(string lapTime)
+    {
+        var components = lapTime.Split(':');
+        var minutes = int.Parse(components[0]);
+        var secondsAndMilliseconds = components[1].Split('.');
+        var seconds = int.Parse(secondsAndMilliseconds[0]);
+        var milliseconds = int.Parse(secondsAndMilliseconds[1]);
+        var totalMilliseconds = minutes * 60 * 1000 + seconds * 1000 + milliseconds;
+        return totalMilliseconds;
+    }
+
+    //use @code in razor components.
+    async void SetSelectedTrack(ChangeEventArgs e)
+    {
+        _selectedTrack = e.Value.ToString();
+        _trackTimes = await TrackTimeService.GetTrackTimes(_selectedTrack);
+    }
+
+    async void AddTrackTime(EventArgs obj)
+    {
+        var trackTime = ConvertToMilliseconds(_laptime);
+        await TrackTimeService.SaveTrackTime(new TrackTime()
+        {
+            Date = DateTime.Now,
+            Id = Guid.NewGuid(),
+            Name = _name,
+            Time = trackTime,
+            TrackId = _selectedTrack
+        });
+
+        _trackTimes = await TrackTimeService.GetTrackTimes(_selectedTrack);
+    }
+
+    async void DeleteTrackTime(Guid trackTimeId)
+    {
+        await TrackTimeService.DeleteTrackTime(trackTimeId);
+
+        _trackTimes = await TrackTimeService.GetTrackTimes(_selectedTrack);
+    }
+}
