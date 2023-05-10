@@ -32,6 +32,11 @@
         <DefaultLanguage>en</DefaultLanguage>
     </PropertyGroup>
 
+    <PropertyGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows' and '$(Configuration)' == 'Release'">
+      <AppxPackageSigningEnabled>true</AppxPackageSigningEnabled>
+      <PackageCertificateThumbprint>AD862915B6FA427D1A27B1092BA8087763D80B4E</PackageCertificateThumbprint>
+    </PropertyGroup>
+
     <ItemGroup>
         <!-- App Icon -->
         <MauiIcon Include="Resources\AppIcon\appicon.svg">
