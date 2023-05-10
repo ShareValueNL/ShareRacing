@@ -41,7 +41,7 @@ jobs:
         run: dotnet restore ShareRacing/ShareRacing.csproj
 
       - name: Build MAUI Android
-        run: dotnet publish ShareRacing/ShareRacing.csproj -c Release -f net7.0-android --no-restore
+        run: dotnet publish ShareRacing/ShareRacing.csproj -c Release -f net7.0-android
 
       - name: Upload Android Artifact
         uses: actions/upload-artifact@3cea5372237819ed00197afe530f5a7ea3e805c8
@@ -70,7 +70,7 @@ jobs:
         run: dotnet restore ShareRacing/ShareRacing.csproj
 
       - name: Build MAUI Windows
-        run: dotnet publish ShareRacing/ShareRacing.csproj -c Release -f net7.0-windows10.0.19041.0 --no-restore
+        run: dotnet publish ShareRacing/ShareRacing.csproj -c Release -f net7.0-windows10.0.19041.0
 
       - name: Upload Windows Artifact
         uses: actions/upload-artifact@3cea5372237819ed00197afe530f5a7ea3e805c8
@@ -99,7 +99,7 @@ jobs:
         run: dotnet restore ShareRacing/ShareRacing.csproj
 
       - name: Build MAUI iOS
-        run: dotnet build ShareRacing/ShareRacing.csproj -c Release -f net7.0-ios --no-restore /p:buildForSimulator=True /p:packageApp=True /p:ArchiveOnBuild=False
+        run: dotnet build ShareRacing/ShareRacing.csproj -c Release -f net7.0-ios /p:buildForSimulator=True /p:packageApp=True /p:ArchiveOnBuild=False
 
       - name: Upload iOS Artifact
         uses: actions/upload-artifact@3cea5372237819ed00197afe530f5a7ea3e805c8
@@ -128,7 +128,7 @@ jobs:
         run: dotnet restore ShareRacing/ShareRacing.csproj
 
       - name: Build MAUI MacCatalyst
-        run: dotnet publish ShareRacing/ShareRacing.csproj -c Release -f net7.0-maccatalyst --no-restore -p:BuildIpa=True
+        run: dotnet publish ShareRacing/ShareRacing.csproj -c Release -f net7.0-maccatalyst -p:BuildIpa=True
 
       - name: Upload MacCatalyst Artifact
         uses: actions/upload-artifact@3cea5372237819ed00197afe530f5a7ea3e805c8
