@@ -30,11 +30,14 @@
         <TargetPlatformMinVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</TargetPlatformMinVersion>
         <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'tizen'">6.5</SupportedOSPlatformVersion>
         <DefaultLanguage>en</DefaultLanguage>
+        <PackageCertificateThumbprint>3AEC4657A0134AD2D261423D5710F6DE1FE16581</PackageCertificateThumbprint>
+        <PackageCertificateKeyFile>ShareRacing_TemporaryKey.pfx</PackageCertificateKeyFile>
+        <AppxPackageSigningEnabled>True</AppxPackageSigningEnabled>
     </PropertyGroup>
 
     <PropertyGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows' and '$(Configuration)' == 'Release'">
       <AppxPackageSigningEnabled>true</AppxPackageSigningEnabled>
-      <PackageCertificateThumbprint>AD862915B6FA427D1A27B1092BA8087763D80B4E</PackageCertificateThumbprint>
+      <PackageCertificateKeyFile>ShareRacing_TemporaryKey.pfx</PackageCertificateKeyFile>
     </PropertyGroup>
 
     <ItemGroup>
