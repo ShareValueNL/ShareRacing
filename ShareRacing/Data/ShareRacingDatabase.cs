@@ -37,7 +37,10 @@ public class ShareRacingDatabase
         if (item.Id != Guid.Empty)
             return await Database.UpdateAsync(item);
         else
+        {
+            item.Id = Guid.NewGuid();
             return await Database.InsertAsync(item);
+        }
     }
 
     public async Task<int> DeleteItemAsync(TrackTime item)

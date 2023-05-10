@@ -32,11 +32,11 @@ else
     <div class="row">
         <div class="col-md-6 form-group">
             <label>Name</label>
-            <input @bind="_name" class="form-control" placeholder="Naam">
+            <input @bind="_name" class="form-control" placeholder="Name">
         </div>
         <div class="col-md-4 form-group">
-            <label>Lap time</label>
-            <input @bind="_laptime" class="form-control" placeholder="Laptime">
+            <label>Lap time (in 1:23:456 format)</label>
+            <input @bind="_laptime" class="form-control" placeholder="1:23.456">
         </div>
         <div class="col-md-2 form-group">
                 <button class="btn btn-primary mt-md-4" @onclick="AddTrackTime">Add lap time</button>
@@ -52,7 +52,7 @@ else
         </tr>
         </thead>
         <tbody>
-        @foreach (var trackTime in _trackTimes)
+        @foreach (var trackTime in _trackTimes.OrderBy(x => x.Time))
         {
             <tr>
                 <td>@trackTime.Name</td>
@@ -78,13 +78,13 @@ else
     {
         _tracks = await TrackService.GetTracks();
     }
-    
+
     private string ConvertToLapTime(int trackTime)
     {
         var seconds = trackTime / 1000;
         var minutes = seconds / 60;
         seconds %= 60;
-        
+
         return $"{minutes:00}:{seconds:00}.{trackTime % 1000:000}";
     }
 
@@ -104,6 +104,8 @@ else
     {
         _selectedTrack = e.Value.ToString();
         _trackTimes = await TrackTimeService.GetTrackTimes(_selectedTrack);
+
+        StateHasChanged();
     }
 
     async void AddTrackTime(EventArgs obj)
@@ -112,13 +114,17 @@ else
         await TrackTimeService.SaveTrackTime(new TrackTime()
         {
             Date = DateTime.Now,
-            Id = Guid.NewGuid(),
             Name = _name,
             Time = trackTime,
             TrackId = _selectedTrack
         });
 
         _trackTimes = await TrackTimeService.GetTrackTimes(_selectedTrack);
+
+        _laptime = null;
+        _name = null;
+
+        StateHasChanged();
     }
 
     async void DeleteTrackTime(Guid trackTimeId)
@@ -126,5 +132,7 @@ else
         await TrackTimeService.DeleteTrackTime(trackTimeId);
 
         _trackTimes = await TrackTimeService.GetTrackTimes(_selectedTrack);
+
+        StateHasChanged();
     }
 }
